@@ -30,16 +30,20 @@
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    padding: 40px 20px 60px;
+    padding: 20px 20px 40px;
     text-align: center;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
   }
 
   .tagline-top {
     color: rgba(255, 200, 210, 0.35);
     font-family: 'Brush Script MT', cursive, sans-serif;
     font-size: 1.1rem;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
   }
 
   /* The container containing both the envelope and the letter */
@@ -47,14 +51,21 @@
     position: relative;
     width: 280px;
     height: 200px;
-    margin: 220px auto 40px; /* Big top gap so the letter has breathing room when up */
+    margin: 40px auto; 
+    /* Smooth shift to perfectly re-center the envelope when opened */
+    transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  /* When open: shift the whole block down to give the letter room at the top */
+  .stage.open .envelope-interactive-area {
+    transform: translateY(100px);
   }
 
   .envelope-wrap {
     position: absolute;
     inset: 0;
     cursor: pointer;
-    z-index: 5; /* Base level for envelope structure */
+    z-index: 5;
   }
 
   .envelope-box {
@@ -94,7 +105,6 @@
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
   }
 
-  /* When open: flap swings up and goes behind the rising letter */
   .stage.open .flap {
     transform: rotateX(180deg);
     z-index: 1;
@@ -126,7 +136,7 @@
     pointer-events: none;
   }
 
-  /* THE LETTER: Placed flat behind the envelope body initially */
+  /* THE LETTER: Hidden flat underneath initially */
   .letter {
     position: absolute;
     left: 10px;
@@ -142,22 +152,22 @@
     line-height: 1.5;
     opacity: 0;
     transform: translateY(0);
-    transition: transform 0.4s ease-in, opacity 0.3s ease, z-index 0s linear 0.4s;
-    z-index: 1; /* Completely hidden underneath back wall at first */
+    transition: transform 0.4s ease-in, opacity 0.3s ease;
+    z-index: 1;
     pointer-events: none;
   }
 
-  /* OPEN STATE: Glides slowly and clears ALL envelope graphics */
+  /* OPEN STATE: Glides out very slowly and lands safely on top */
   .stage.open .letter {
     opacity: 1;
-    /* Pushes letter entirely higher than the envelope frame so it can never be covered */
-    transform: translateY(-210px); 
+    /* Slides up to stand tall and overlay completely in front */
+    transform: translateY(-150px); 
     box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     pointer-events: auto;
-    /* 1.4 seconds smooth pop up, waits 0.5s for the flap cover to fully clear out of the way */
+    /* Very slow, elegant reveal after flap clears */
     transition: transform 1.4s cubic-bezier(0.25, 1, 0.5, 1) 0.5s, 
                 opacity 0.5s ease 0.5s;
-    z-index: 99; /* Absolute top priority layer */
+    z-index: 99;
   }
 
   .letter .eyebrow {
@@ -214,6 +224,11 @@
     display: flex;
     justify-content: center;
     gap: 16px;
+    margin-top: 120px; /* Adjusted spacing to clear the shifted layout */
+    transition: margin-top 1s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .stage.open .controls {
     margin-top: 40px;
   }
 
@@ -244,14 +259,14 @@
   }
 
   .footer {
-    margin-top: 60px;
+    margin-top: 40px;
     color: rgba(255, 92, 122, 0.35);
     font-size: 0.8rem;
     letter-spacing: 1px;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flap, .letter, .stage.open .hearts-float span { transition: none; animation: none; }
+    .flap, .letter, .envelope-interactive-area, .stage.open .hearts-float span { transition: none; animation: none; }
   }
 </style>
 </head>
@@ -260,10 +275,9 @@
 <div class="stage" id="stage">
   <div class="tagline-top">A little message for someone special...</div>
 
-  <!-- Shared wrapper zone keeping layout components synchronized -->
   <div class="envelope-interactive-area">
     
-    <!-- THE LETTER: Extracted outward so it can safely float over all parent items -->
+    <!-- THE LETTER -->
     <div class="letter" id="letterElement">
       <p class="eyebrow">Personal & Confidential</p>
       <p>Dear <span id="toNameLower"></span>,</p>
@@ -316,7 +330,6 @@
   function openEnvelope() { stage.classList.add('open'); }
   function closeEnvelope() { stage.classList.remove('open'); }
 
-  // Clicks anywhere on the wrapper switches state unless letter is active
   envelope.addEventListener('click', () => {
     stage.classList.contains('open') ? closeEnvelope() : openEnvelope();
   });
