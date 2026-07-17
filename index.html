@@ -42,18 +42,24 @@
     margin-bottom: 40px;
   }
 
-  .envelope-wrap {
+  /* The container containing both the envelope and the letter */
+  .envelope-interactive-area {
     position: relative;
     width: 280px;
     height: 200px;
-    margin: 180px auto 40px; /* Generous top margin so the slowly rising letter has space */
+    margin: 220px auto 40px; /* Big top gap so the letter has breathing room when up */
+  }
+
+  .envelope-wrap {
+    position: absolute;
+    inset: 0;
     cursor: pointer;
+    z-index: 5; /* Base level for envelope structure */
   }
 
   .envelope-box {
     position: absolute;
     inset: 0;
-    z-index: 2;
   }
 
   .envelope-body {
@@ -83,16 +89,15 @@
     border-right: 140px solid transparent;
     border-top: 105px solid #e0304f;
     transform-origin: top center;
-    /* Flaps open in 0.5s when opening; Closes in 0.4s with a delay when closing */
-    transition: transform 0.5s ease-in-out, z-index 0s linear 0.25s;
+    transition: transform 0.5s ease-in-out, z-index 0s linear;
     z-index: 4; 
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
   }
 
-  /* OPEN STATE: Flap opens back first */
+  /* When open: flap swings up and goes behind the rising letter */
   .stage.open .flap {
     transform: rotateX(180deg);
-    z-index: 1; /* Moves behind everything so it doesn't clip the rising letter */
+    z-index: 1;
   }
 
   .seal {
@@ -109,7 +114,7 @@
     justify-content: center;
     color: #ffd7de;
     font-size: 1.2rem;
-    z-index: 5;
+    z-index: 6;
     background: #b40a28;
     transition: opacity 0.3s ease, transform 0.3s ease;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -121,15 +126,15 @@
     pointer-events: none;
   }
 
-  /* THE LETTER: Tucked fully inside the envelope base layer originally */
+  /* THE LETTER: Placed flat behind the envelope body initially */
   .letter {
     position: absolute;
-    left: 12px;
-    right: 12px;
+    left: 10px;
+    right: 10px;
     bottom: 10px;
     background: #fbf3e7;
-    border-radius: 6px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 22px 20px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     text-align: left;
     font-family: 'Georgia', serif;
@@ -137,22 +142,22 @@
     line-height: 1.5;
     opacity: 0;
     transform: translateY(0);
-    /* Standard quick speed when closing back down */
-    transition: transform 0.4s ease-in, opacity 0.3s ease;
-    z-index: 3; /* Always sits above the flipped-open flap */
+    transition: transform 0.4s ease-in, opacity 0.3s ease, z-index 0s linear 0.4s;
+    z-index: 1; /* Completely hidden underneath back wall at first */
     pointer-events: none;
   }
 
-  /* OPEN STATE: Letter rises up slowly AFTER the flap finishes opening */
+  /* OPEN STATE: Glides slowly and clears ALL envelope graphics */
   .stage.open .letter {
     opacity: 1;
-    transform: translateY(-190px); /* Fully steps out from inside the envelope */
+    /* Pushes letter entirely higher than the envelope frame so it can never be covered */
+    transform: translateY(-210px); 
     box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     pointer-events: auto;
-    /* Very slow 1.4 second rise up, waiting 0.45s for the cover flap to open completely first */
-    transition: transform 1.4s cubic-bezier(0.25, 1, 0.5, 1) 0.45s, 
-                opacity 0.6s ease 0.45s;
-    z-index: 10; /* Completely clears and sits on top of all layers */
+    /* 1.4 seconds smooth pop up, waits 0.5s for the flap cover to fully clear out of the way */
+    transition: transform 1.4s cubic-bezier(0.25, 1, 0.5, 1) 0.5s, 
+                opacity 0.5s ease 0.5s;
+    z-index: 99; /* Absolute top priority layer */
   }
 
   .letter .eyebrow {
@@ -185,7 +190,7 @@
     inset: 0;
     pointer-events: none;
     overflow: visible;
-    z-index: 6;
+    z-index: 10;
   }
 
   .hearts-float span {
@@ -196,14 +201,13 @@
   }
 
   .stage.open .hearts-float span {
-    /* Burst triggers alongside the slow letter reveal */
     animation: floatUp 2.5s ease-out 0.6s forwards;
   }
 
   @keyframes floatUp {
     0%   { opacity: 0; transform: translateY(0) scale(0.6) rotate(0deg); }
     20%  { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-240px) scale(1.3) rotate(20deg); }
+    100% { opacity: 0; transform: translateY(-260px) scale(1.3) rotate(20deg); }
   }
 
   .controls {
@@ -256,8 +260,11 @@
 <div class="stage" id="stage">
   <div class="tagline-top">A little message for someone special...</div>
 
-  <div class="envelope-wrap" id="envelope">
-    <div class="letter">
+  <!-- Shared wrapper zone keeping layout components synchronized -->
+  <div class="envelope-interactive-area">
+    
+    <!-- THE LETTER: Extracted outward so it can safely float over all parent items -->
+    <div class="letter" id="letterElement">
       <p class="eyebrow">Personal & Confidential</p>
       <p>Dear <span id="toNameLower"></span>,</p>
       <p>There are a million tiny things that make up who you are, and somehow, every single one of them has caught my attention.</p>
@@ -266,18 +273,22 @@
       <p class="signoff">— <span id="signed"></span> 💌</p>
     </div>
     
-    <div class="envelope-box">
-      <div class="envelope-body">
-        <div class="hearts-float">
-          <span style="left:15%; bottom:30%;">♥</span>
-          <span style="left:45%; bottom:20%; animation-delay:0.2s;">♥</span>
-          <span style="left:70%; bottom:40%; animation-delay:0.4s;">♥</span>
-          <span style="left:30%; bottom:10%; animation-delay:0.7s;">♥</span>
+    <!-- THE ENVELOPE -->
+    <div class="envelope-wrap" id="envelope">
+      <div class="envelope-box">
+        <div class="envelope-body">
+          <div class="hearts-float">
+            <span style="left:15%; bottom:30%;">♥</span>
+            <span style="left:45%; bottom:20%; animation-delay:0.2s;">♥</span>
+            <span style="left:70%; bottom:40%; animation-delay:0.4s;">♥</span>
+            <span style="left:30%; bottom:10%; animation-delay:0.7s;">♥</span>
+          </div>
         </div>
+        <div class="flap"></div>
+        <div class="seal">♥</div>
       </div>
-      <div class="flap"></div>
-      <div class="seal">♥</div>
     </div>
+
   </div>
 
   <div class="controls">
@@ -305,8 +316,8 @@
   function openEnvelope() { stage.classList.add('open'); }
   function closeEnvelope() { stage.classList.remove('open'); }
 
-  envelope.addEventListener('click', (e) => {
-    if (stage.classList.contains('open') && e.target.closest('.letter')) return;
+  // Clicks anywhere on the wrapper switches state unless letter is active
+  envelope.addEventListener('click', () => {
     stage.classList.contains('open') ? closeEnvelope() : openEnvelope();
   });
   
