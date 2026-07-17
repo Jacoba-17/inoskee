@@ -16,81 +16,119 @@
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background: radial-gradient(circle at center, #2a0a10, #12040a 60%, #0a0206);
+    background: radial-gradient(ellipse at center, #2a0a10 0%, #12040a 60%, #0a0206 100%);
     font-family: 'Segoe UI', Tahoma, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    overflow-x: hidden;
   }
 
   .stage {
     position: relative;
-    width: 300px;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
     text-align: center;
   }
 
-  .envelope {
+  .envelope-wrap {
+    position: relative;
+    width: 280px;
+    margin: 0 auto 40px;
+    cursor: pointer;
+  }
+
+  .envelope-box {
     position: relative;
     width: 280px;
     height: 200px;
-    margin: 0 auto;
-    cursor: pointer;
   }
 
   .envelope-body {
     position: absolute;
     inset: 0;
-    background: linear-gradient(145deg, #c81e3a, #9c142f);
-    border-radius: 8px 8px 12px 12px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    background: linear-gradient(145deg, #c81e3a, #8f1226);
+    border-radius: 10px;
+    box-shadow: 0 0 40px rgba(220, 30, 60, 0.45), 0 10px 30px rgba(0,0,0,0.5);
     overflow: hidden;
+    z-index: 1;
   }
 
-  /* Flap */
   .flap {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 105px;
-    background: linear-gradient(#e0304f, #c81e3a);
-    clip-path: polygon(0 0, 50% 65%, 100% 0);
-    transition: transform 0.8s cubic-bezier(0.6, -0.3, 0.3, 1.2);
-    z-index: 5;
+    top: 0; left: 0; right: 0;
+    height: 0;
+    border-left: 140px solid transparent;
+    border-right: 140px solid transparent;
+    border-top: 105px solid #e0304f;
     transform-origin: top center;
+    transition: transform 0.85s cubic-bezier(.68,-0.4,.27,1.4);
+    z-index: 5;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
   }
 
   .stage.open .flap {
-    transform: rotateX(175deg);
+    transform: rotateX(180deg);
   }
 
-  /* Letter */
+  .seal {
+    position: absolute;
+    top: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    border: 2px dashed rgba(255,255,255,0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffd7de;
+    font-size: 1.2rem;
+    z-index: 6;
+    background: rgba(180,10,40,0.4);
+    transition: opacity 0.4s ease;
+  }
+
+  .stage.open .seal { opacity: 0; }
+
+  /* FIXED LETTER POSITIONING */
   .letter {
     position: absolute;
-    top: 65px;
     left: 15px;
+    top: 78px;           /* Adjusted starting position */
     width: 250px;
-    background: #fffdf0;
-    border: 1px solid #f0d8c0;
-    border-radius: 4px;
-    padding: 18px 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-    color: #5c1e2a;
-    font-family: Georgia, serif;
+    background: #fbf3e7;
+    border-radius: 6px;
+    padding: 0 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    text-align: left;
+    font-family: 'Georgia', serif;
+    color: #7a1626;
     line-height: 1.6;
-    z-index: 4;
-    opacity: 0;
-    transform: translateY(40px) scale(0.92);
-    transition: all 1.1s cubic-bezier(0.25, 0.8, 0.25, 1) 0.4s;
+    z-index: 4;          /* Above flap when open */
     max-height: 0;
+    opacity: 0;
     overflow: hidden;
+    transition: 
+      max-height 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s,
+      opacity 1s ease 0.5s,
+      transform 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s;
+    transform: translateY(35px);
   }
 
   .stage.open .letter {
+    max-height: 480px;
     opacity: 1;
-    transform: translateY(-12px) scale(1);
-    max-height: 380px;
+    transform: translateY(-15px);   /* Pops up while bottom stays tucked */
+    padding: 22px 20px;
+  }
+
+  .letter .eyebrow {
+    font-size: 0.85rem;
+    color: #b23a52;
+    margin: 0 0 12px;
+    font-style: italic;
+    text-align: center;
   }
 
   .letter p {
@@ -98,89 +136,81 @@
     font-size: 0.96rem;
   }
 
-  .eyebrow {
-    font-size: 0.85rem;
-    color: #c53d5e;
-    text-align: center;
-    margin-bottom: 12px;
-  }
-
-  .signoff {
-    margin-top: 16px;
+  .letter .signoff {
+    margin-top: 18px;
     font-style: italic;
-    color: #c53d5e;
+    color: #b23a52;
   }
 
-  /* Hearts */
-  .heart {
+  .hearts-float {
     position: absolute;
-    color: #ff4d6d;
-    font-size: 1.4rem;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 2;
+  }
+
+  .hearts-float span {
+    position: absolute;
     opacity: 0;
-    z-index: 3;
+    color: #ff5c7a;
+    font-size: 1.2rem;
   }
 
-  .stage.open .heart {
-    animation: floatHeart 2.8s ease-in forwards;
+  .stage.open .hearts-float span {
+    animation: floatUp 2.6s ease-in forwards;
   }
 
-  @keyframes floatHeart {
-    0% { opacity: 0; transform: translateY(0) scale(0.6); }
-    30% { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-180px) scale(1.1); }
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(0) scale(0.8); }
+    25% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-170px) scale(1.1); }
   }
 
-  .controls {
-    margin-top: 35px;
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-  }
-
+  .controls { margin-top: 30px; display: flex; justify-content: center; gap: 16px; }
   .btn {
-    padding: 12px 32px;
-    border: 2px solid #e0304f;
+    padding: 10px 26px;
+    border-radius: 30px;
+    border: 1.5px solid #e0435f;
     background: transparent;
-    color: #ffd0d9;
-    border-radius: 50px;
-    font-size: 1.1rem;
+    color: #ffd7de;
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 1.15rem;
     cursor: pointer;
-    transition: all 0.3s;
   }
-
-  .btn:hover {
-    background: rgba(224, 48, 79, 0.2);
-  }
+  .btn:hover { background: rgba(224, 48, 79, 0.25); }
 </style>
 </head>
 <body>
 
 <div class="stage" id="stage">
-  <div class="envelope" id="envelope">
-    <div class="envelope-body">
-      <!-- Floating hearts -->
-      <div class="heart" style="left:25%; bottom:30%; animation-delay:0.2s;">♥</div>
-      <div class="heart" style="left:55%; bottom:45%; animation-delay:0.6s;">♥</div>
-      <div class="heart" style="left:75%; bottom:25%; animation-delay:1s;">♥</div>
-    </div>
-    <div class="flap"></div>
-
-    <!-- The Letter -->
+  <div class="envelope-wrap" id="envelope">
     <div class="letter">
-      <p class="eyebrow">◆ To: <span id="toName"></span> ◆</p>
+      <p class="eyebrow">To: <span id="toName"></span></p>
       <p>Dear <span id="toNameLower"></span>,</p>
-      <p>I ❤️ynah Vala Lu a hai</p>
-      <p>I tello chuan ser mu pawh a al</p>
-      <p>Hmarcha te hi a thak lo re2,</p>
+      <p>Every time I see you, my heart forgets how to behave.</p>
+      <p>I don't need much — just a little more of your time, your laugh, your presence.</p>
+      <p>If you ever wonder who's thinking of you, it's me. Always.</p>
       <p class="signoff">— <span id="signed"></span> 💌</p>
+    </div>
+
+    <div class="envelope-box">
+      <div class="envelope-body">
+        <div class="hearts-float">
+          <span style="left:22%; bottom:38%;">♥</span>
+          <span style="left:52%; bottom:22%; animation-delay:0.3s;">♥</span>
+          <span style="left:72%; bottom:42%; animation-delay:0.7s;">♥</span>
+        </div>
+      </div>
+      <div class="flap"></div>
+      <div class="seal">♥</div>
     </div>
   </div>
 
   <div class="controls">
-    <button class="btn" id="openBtn">Open ♦</button>
+    <button class="btn" id="openBtn">Open ✦</button>
     <button class="btn" id="closeBtn">Close</button>
   </div>
-  <p style="margin-top:10px; color:#ff8da6; font-style:italic;">click the envelope or use the buttons</p>
 </div>
 
 <script>
@@ -203,7 +233,6 @@
   envelope.addEventListener('click', () => {
     stage.classList.contains('open') ? closeEnvelope() : openEnvelope();
   });
-
   openBtn.addEventListener('click', e => { e.stopPropagation(); openEnvelope(); });
   closeBtn.addEventListener('click', e => { e.stopPropagation(); closeEnvelope(); });
 </script>
