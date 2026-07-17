@@ -35,7 +35,7 @@
   .envelope-wrap {
     position: relative;
     width: 280px;
-    margin: 80px auto 40px;   /* Moved lower */
+    margin: 60px auto 40px;
     cursor: pointer;
   }
 
@@ -93,11 +93,11 @@
 
   .stage.open .seal { opacity: 0; }
 
-  /* Letter - Fully appears */
+  /* Letter - Starts lower inside envelope, pops upward */
   .letter {
     position: absolute;
     left: 15px;
-    top: 65px;
+    top: 95px;                    /* Starts deeper inside */
     width: 250px;
     background: #fbf3e7;
     border-radius: 6px;
@@ -112,16 +112,16 @@
     opacity: 0;
     overflow: hidden;
     transition: 
-      max-height 1.2s cubic-bezier(0.25, 0.8, 0.3, 1) 0.5s,
-      opacity 1s ease 0.5s,
-      transform 1.2s cubic-bezier(0.25, 0.8, 0.3, 1) 0.5s;
-    transform: translateY(50px) scale(0.95);
+      max-height 1.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s,
+      opacity 1s ease 0.45s,
+      transform 1.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s;
+    transform: translateY(40px);
   }
 
   .stage.open .letter {
     max-height: 520px;
     opacity: 1;
-    transform: translateY(-25px) scale(1);   /* Fully pops out */
+    transform: translateY(-45px);     /* Pops higher upward */
     padding: 24px 20px;
   }
 
