@@ -10,7 +10,7 @@
      ============================================================ */
   :root {
     --to-name: "Crush";
-    --signed-name: "With all my love";
+    --signed-name: "with love";
   }
   /* ============================================================ */
 
@@ -30,47 +30,32 @@
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    padding: 20px 20px 40px;
+    padding: 40px 20px 60px;
     text-align: center;
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 100vh;
   }
 
   .tagline-top {
     color: rgba(255, 200, 210, 0.35);
     font-family: 'Brush Script MT', cursive, sans-serif;
     font-size: 1.1rem;
-    margin-bottom: 20px;
-  }
-
-  /* The container containing both the envelope and the letter */
-  .envelope-interactive-area {
-    position: relative;
-    width: 280px;
-    height: 200px;
-    margin: 40px auto; 
-    /* Smooth shift to perfectly re-center the envelope when opened */
-    transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  /* When open: shift the whole block down to give the letter room at the top */
-  .stage.open .envelope-interactive-area {
-    transform: translateY(100px);
+    margin-bottom: 60px;
   }
 
   .envelope-wrap {
-    position: absolute;
-    inset: 0;
+    position: relative;
+    width: 280px;
+    margin: 0 auto 40px;
     cursor: pointer;
-    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .envelope-box {
-    position: absolute;
-    inset: 0;
+    position: relative;
+    width: 280px;
+    height: 200px;
   }
 
   .envelope-body {
@@ -80,7 +65,7 @@
     border-radius: 10px;
     box-shadow: 0 0 40px rgba(220, 30, 60, 0.45), 0 10px 30px rgba(0,0,0,0.5);
     overflow: hidden;
-    z-index: 2;
+    z-index: 1;
   }
 
   .envelope-body::before {
@@ -100,19 +85,18 @@
     border-right: 140px solid transparent;
     border-top: 105px solid #e0304f;
     transform-origin: top center;
-    transition: transform 0.5s ease-in-out, z-index 0s linear;
-    z-index: 4; 
+    transition: transform 0.8s cubic-bezier(.68,-0.4,.27,1.4);
+    z-index: 4;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
   }
 
   .stage.open .flap {
     transform: rotateX(180deg);
-    z-index: 1;
   }
 
   .seal {
     position: absolute;
-    top: 85px;
+    top: 48px;
     left: 50%;
     transform: translateX(-50%);
     width: 44px;
@@ -124,78 +108,66 @@
     justify-content: center;
     color: #ffd7de;
     font-size: 1.2rem;
-    z-index: 6;
-    background: #b40a28;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 5;
+    background: rgba(180,10,40,0.4);
+    transition: opacity 0.4s ease;
   }
 
-  .stage.open .seal { 
-    opacity: 0; 
-    transform: translateX(-50%) scale(0.5);
-    pointer-events: none;
-  }
+  .stage.open .seal { opacity: 0; }
 
-  /* THE LETTER: Hidden flat underneath initially */
+  /* Letter - now positioned inside the envelope area */
   .letter {
     position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
+    left: 50%;
+    top: 85px; /* starts hidden inside the envelope */
+    transform: translateX(-50%) translateY(0);
+    width: 250px;
+    max-width: 100%;
     background: #fbf3e7;
-    border-radius: 8px;
-    padding: 22px 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border-radius: 6px;
+    padding: 0 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
     text-align: left;
     font-family: 'Georgia', serif;
     color: #7a1626;
-    line-height: 1.5;
+    line-height: 1.55;
+    z-index: 3; /* higher than flap so it covers the open flap */
+    max-height: 0;
     opacity: 0;
-    transform: translateY(0);
-    transition: transform 0.4s ease-in, opacity 0.3s ease;
-    z-index: 1;
-    pointer-events: none;
+    overflow: hidden;
+    transition: 
+      max-height 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.45s,
+      opacity 0.9s ease 0.45s,
+      transform 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.45s,
+      padding 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.45s;
   }
 
-  /* OPEN STATE: Glides out very slowly and lands safely on top */
   .stage.open .letter {
+    max-height: 520px;
     opacity: 1;
-    /* Slides up to stand tall and overlay completely in front */
-    transform: translateY(-150px); 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-    pointer-events: auto;
-    /* Very slow, elegant reveal after flap clears */
-    transition: transform 1.4s cubic-bezier(0.25, 1, 0.5, 1) 0.5s, 
-                opacity 0.5s ease 0.5s;
-    z-index: 99;
+    transform: translateX(-50%) translateY(-25px); /* pops up nicely */
+    padding: 22px 20px;
   }
 
   .letter .eyebrow {
     font-size: 0.8rem;
     color: #b23a52;
-    margin: 0 0 12px;
+    margin: 0 0 10px;
     font-style: italic;
-    text-align: center;
-    border-bottom: 1px dashed rgba(178, 58, 82, 0.2);
-    padding-bottom: 6px;
   }
 
   .letter .eyebrow::before { content: "✦ "; }
   .letter .eyebrow::after { content: " ✦"; }
 
   .letter p {
-  width: auto;
-  height: 90vh; /* Keeps it within the viewport height */
-  aspect-ratio: 8.5 / 11; /* Maintains standard US Letter proportions */
-  margin: auto;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Gives it a paper-like shadow */
-}
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+  }
 
   .letter .signoff {
-    margin-top: 15px;
+    margin-top: 14px;
     font-style: italic;
     color: #b23a52;
-    text-align: right;
   }
 
   .hearts-float {
@@ -203,36 +175,31 @@
     inset: 0;
     pointer-events: none;
     overflow: visible;
-    z-index: 10;
+    z-index: 2;
   }
 
   .hearts-float span {
     position: absolute;
     opacity: 0;
     color: #ff5c7a;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 
   .stage.open .hearts-float span {
-    animation: floatUp 2.5s ease-out 0.6s forwards;
+    animation: floatUp 2.4s ease-in forwards;
   }
 
   @keyframes floatUp {
-    0%   { opacity: 0; transform: translateY(0) scale(0.6) rotate(0deg); }
-    20%  { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-260px) scale(1.3) rotate(20deg); }
+    0%   { opacity: 0; transform: translateY(0) scale(0.8); }
+    15%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-160px) scale(1.1); }
   }
 
   .controls {
     display: flex;
     justify-content: center;
     gap: 16px;
-    margin-top: 120px; /* Adjusted spacing to clear the shifted layout */
-    transition: margin-top 1s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  .stage.open .controls {
-    margin-top: 40px;
+    margin-top: 30px;
   }
 
   .btn {
@@ -241,11 +208,10 @@
     border: 1.5px solid #e0435f;
     background: transparent;
     color: #ffd7de;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 1.15rem;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: background 0.25s ease, box-shadow 0.25s ease;
   }
 
   .btn:hover, .btn:focus-visible {
@@ -256,65 +222,58 @@
 
   .hint {
     margin-top: 14px;
-    color: rgba(255,215,222,0.4);
-    font-size: 0.85rem;
-    font-style: italic;
+    color: rgba(255,215,222,0.5);
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 0.95rem;
   }
 
   .footer {
-    margin-top: 40px;
-    color: rgba(255, 92, 122, 0.35);
-    font-size: 0.8rem;
-    letter-spacing: 1px;
+    margin-top: 70px;
+    color: rgba(255, 92, 122, 0.55);
+    font-size: 0.9rem;
+    font-family: 'Brush Script MT', cursive, sans-serif;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flap, .letter, .envelope-interactive-area, .stage.open .hearts-float span { transition: none; animation: none; }
+    .flap, .letter, .stage.open .hearts-float span { transition: none; animation: none; }
   }
 </style>
 </head>
 <body>
 
 <div class="stage" id="stage">
-  <div class="tagline-top">A little message for someone special...</div>
+  <div class="tagline-top">♥ made with love ♥</div>
 
-  <div class="envelope-interactive-area">
-    
-    <!-- THE LETTER -->
-    <div class="letter" id="letterElement">
-      <p class="eyebrow">Personal & Confidential</p>
+  <div class="envelope-wrap" id="envelope">
+    <div class="letter">
+      <p class="eyebrow">To: <span id="toName"></span></p>
       <p>Dear <span id="toNameLower"></span>,</p>
-      <p>There are a million tiny things that make up who you are, and somehow, every single one of them has caught my attention.</p>
-      <p>It’s in the way you laugh, the way you speak, and how effortlessly you brighten up any space you walk into.</p>
-      <p>I just wanted to send a little reminder your way tonight: you are incredibly special to me, and you're always on my mind.</p>
+      <p>Every time I see you, my heart forgets how to behave.</p>
+      <p>I don't need much — just a little more of your time, your laugh, your presence.</p>
+      <p>If you ever wonder who's thinking of you, it's me. Always.</p>
       <p class="signoff">— <span id="signed"></span> 💌</p>
     </div>
-    
-    <!-- THE ENVELOPE -->
-    <div class="envelope-wrap" id="envelope">
-      <div class="envelope-box">
-        <div class="envelope-body">
-          <div class="hearts-float">
-            <span style="left:15%; bottom:30%;">♥</span>
-            <span style="left:45%; bottom:20%; animation-delay:0.2s;">♥</span>
-            <span style="left:70%; bottom:40%; animation-delay:0.4s;">♥</span>
-            <span style="left:30%; bottom:10%; animation-delay:0.7s;">♥</span>
-          </div>
+    <div class="envelope-box">
+      <div class="envelope-body">
+        <div class="hearts-float">
+          <span style="left:20%; bottom:40%;">♥</span>
+          <span style="left:50%; bottom:20%; animation-delay:0.3s;">♥</span>
+          <span style="left:75%; bottom:35%; animation-delay:0.6s;">♥</span>
+          <span style="left:35%; bottom:15%; animation-delay:0.9s;">♥</span>
         </div>
-        <div class="flap"></div>
-        <div class="seal">♥</div>
       </div>
+      <div class="flap"></div>
+      <div class="seal">♥</div>
     </div>
-
   </div>
 
   <div class="controls">
-    <button class="btn" id="openBtn">Open Letter ✦</button>
+    <button class="btn" id="openBtn">Open ✦</button>
     <button class="btn" id="closeBtn">Close</button>
   </div>
-  <div class="hint">Tap the envelope or use the buttons above</div>
+  <div class="hint">click the envelope or use the buttons</div>
 
-  <div class="footer">MADE WITH LOVE</div>
+  <div class="footer">♥ Made with love ♥</div>
 </div>
 
 <script>
@@ -327,18 +286,29 @@
   const toName = rootStyles.getPropertyValue('--to-name').trim().replace(/"/g, '');
   const signedName = rootStyles.getPropertyValue('--signed-name').trim().replace(/"/g, '');
 
-  document.getElementById('toNameLower').textContent = toName;
+  document.getElementById('toName').textContent = toName;
+  document.getElementById('toNameLower').textContent = toName.toLowerCase();
   document.getElementById('signed').textContent = signedName;
 
-  function openEnvelope() { stage.classList.add('open'); }
-  function closeEnvelope() { stage.classList.remove('open'); }
+  function openEnvelope() { 
+    stage.classList.add('open'); 
+  }
+  
+  function closeEnvelope() { 
+    stage.classList.remove('open'); 
+  }
 
   envelope.addEventListener('click', () => {
     stage.classList.contains('open') ? closeEnvelope() : openEnvelope();
   });
-  
-  openBtn.addEventListener('click', (e) => { e.stopPropagation(); openEnvelope(); });
-  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeEnvelope(); });
+  openBtn.addEventListener('click', (e) => { 
+    e.stopPropagation(); 
+    openEnvelope(); 
+  });
+  closeBtn.addEventListener('click', (e) => { 
+    e.stopPropagation(); 
+    closeEnvelope(); 
+  });
 </script>
 
 </body>
